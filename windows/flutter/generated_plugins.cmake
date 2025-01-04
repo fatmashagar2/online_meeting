@@ -3,6 +3,15 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  cloud_firestore
+  file_selector_windows
+  firebase_core
+  flutter_screen_capture
+  flutter_webrtc
+  permission_handler_windows
+  screen_retriever_windows
+  share_plus
+  url_launcher_windows
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST
