@@ -1,13 +1,34 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-
+import 'package:online_meeting/features/home/presentation/view/home_view.dart';
+import '../reset_password_screen.dart';
 import 'forget_password_instruction_text.dart';
 import 'forget_send_button.dart';
 import 'login_text_field.dart';
 
 class ForgotPasswordBody extends StatelessWidget {
   final _emailController = TextEditingController();
-   ForgotPasswordBody({super.key});
+  ForgotPasswordBody({super.key});
+
+  // الدالة لإرسال رابط إعادة تعيين كلمة المرور
+  Future<void> _resetPassword(BuildContext context) async {
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: _emailController.text);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('تم إرسال رابط إعادة تعيين كلمة المرور إلى بريدك الإلكتروني'),
+      ));
+
+      // الانتقال إلى صفحة إعادة تعيين كلمة المرور
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('حدث خطأ: ${e.message}'),
+      ));
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,9 +39,13 @@ class ForgotPasswordBody extends StatelessWidget {
         children: [
           const ForgotPasswordInstructionText(),
           const SizedBox(height: 50),
-          LoginTextField(controller: _emailController, labelText: 'Email', prefixIcon: Icons.email,),
+          LoginTextField(
+            controller: _emailController,
+            labelText: 'Email',
+            prefixIcon: Icons.email,
+          ),
           const SizedBox(height: 100),
-          ForgotPasswordSendButton(),
+          ForgotPasswordSendButton(onPressed: () => _resetPassword(context)),
         ],
       ),
     );

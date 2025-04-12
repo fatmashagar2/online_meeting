@@ -11,7 +11,7 @@ class ProfileScreen extends StatelessWidget {
     return DefaultTabController(
       length: 2, // Number of tabs
       child: Scaffold(
-        appBar: CustomAppBar(txt: "Profile And Edit Profile"),
+        appBar: CustomAppBar(txt: "Profile And Edit Profile", isIconVisible: false,),
         body: TabBarView(
           children: [
             ProfileView(),

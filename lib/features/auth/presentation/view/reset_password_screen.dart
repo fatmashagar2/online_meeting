@@ -9,8 +9,7 @@ class ResetPasswordView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar:CustomAppBar(txt: "Reset Password"),
+       appBar:CustomAppBar(txt: "Reset Password", isIconVisible: false,),
       body:  ResetPasswordBody(),
     );
   }
