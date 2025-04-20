@@ -16,20 +16,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       height: preferredSize.height,
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xff092147), Color(0xff1E54A6)],
+          colors: [Color(0xFF1E1F22), Color(0xFF1E1F22)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(0xff1E54A6).withOpacity(0.5),
+            color: Color(0xFF1E1F22),
             blurRadius: 8.8,
             offset: const Offset(0, 4),
           ),
         ],
         border: Border(
           bottom: BorderSide(
-            color: Color(0xff1E54A6),
+            color: Color(0xFF2E2E2E),
             width: 0.5.w,  // استخدم ScreenUtil لقياس العرض
           ),
         ),

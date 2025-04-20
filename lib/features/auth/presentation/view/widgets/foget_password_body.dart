@@ -37,7 +37,12 @@ class ForgotPasswordBody extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const ForgotPasswordInstructionText(),
+          const SizedBox(height: 80),
+          Center(
+            child: Text( 'FORGET PASSWORD',style: TextStyle(
+                fontFamily: 'Nosifer',fontSize: 20,color:Color(0xFF2E2E2E)
+            ),),
+          ),
           const SizedBox(height: 50),
           LoginTextField(
             controller: _emailController,

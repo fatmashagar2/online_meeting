@@ -14,14 +14,14 @@ class SplashViewBody extends StatelessWidget {
     return Scaffold(
      backgroundColor: Color(0xffFCFEFC),
       body:
-          Center(
-            child: Image.asset(
-              'assets/nn.gif',
-              width: 250,
-              height: 250,
-            ),
-          )
-
+          // Center(
+          //   child: Image.asset(
+          //     'assets/img10.jpg',
+          //     width: 250,
+          //     height: 250,
+          //   ),
+          // )
+Center(child: Text("EDU FOCUS",style: TextStyle(fontFamily: 'Fredericka_the_Great',fontSize: 40),))
     );
   }
 }

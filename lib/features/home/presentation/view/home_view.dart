@@ -12,9 +12,11 @@ import 'package:online_meeting/main.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../chat/presentation/view/chat_view.dart';
+import '../../../custom_button.dart';
 import '../../../notification/ConcentrationNotifications.dart';
 import '../../../profile/presentation/view/widgets/profile_screen.dart';
 import 'open_meeting_view.dart';
+import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +28,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _conferenceIdController = TextEditingController();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  bool isMeetingStarted = false; // متغير لتحديد إذا ما كان الميتنج بدأ
 
   Future<void> _joinConference({required bool isCreating}) async {
     final String conferenceId = isCreating
@@ -44,7 +47,8 @@ class _HomeScreenState extends State<HomeScreen> {
         "createdAt": Timestamp.now(),
       });
     } else {
-      final doc = await _firestore.collection("meetings").doc(conferenceId).get();
+      final doc =
+          await _firestore.collection("meetings").doc(conferenceId).get();
       if (!doc.exists) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Meeting ID does not exist")),
@@ -71,62 +75,83 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(txt: "Home Page", isIconVisible: false,),
-      body: Padding(
-        padding: const EdgeInsets.only(top: 150, right: 16, left: 16),
-        child: GridView.count(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          children: [
-            HomeIcon(
-              icon: Icons.video_call,
-              label: "Create Meeting",
-              onTap: () => _startMeeting(),
-            ),
-            HomeIcon(
-              icon: Icons.settings,
-              label: "Settings",
-              onTap: () => _openSettings(context),
-            ),
-            HomeIcon(
-              icon: Icons.meeting_room,
-              label: "Open Meeting",
-              onTap: () => _openMeeting(context),
-            ),
-            HomeIcon(
-              icon: Icons.notifications,
-              label: "Notifications",
-              onTap: () => _showChat(context),
-            ),
-          ],
+        backgroundColor: Colors.white,
+        appBar: CustomAppBar(
+          txt: "Home Page",
+          isIconVisible: false,
         ),
+        body: Center(
+            child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Align(
+                alignment: Alignment.topLeft,
+                child: Row(
+                  children: [Text("Hi Fatma",style: TextStyle(fontWeight: FontWeight.bold),), Image.asset("assets/wave.gif",width: 30,height: 30,)
+                 ],
+                ),
+              ),
+            ),
+            SizedBox(height: 20,),
+            Image.asset("assets/img.png"),
+            SizedBox(height: 20,),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CustomButton(
+                text: "Let's Go",
+                w: double.infinity,
+                onPressed: () {
+                  _startMeeting();
+                },
+              ),
+            ) ,SizedBox(height: 20,),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: CustomButton(
+                text: "Create Quiz",
+                w: double.infinity,
+                onPressed: () {
+                 //Navigator.push(context, MaterialPageRoute(builder: (context)=>CreateQuestionScreen()));
+                },
+              ),
+            )
+          ],
+        )),
+      floatingActionButton: SpeedDial(
+        icon: Icons.add,
+        activeIcon: Icons.close,
+        children: [
+          SpeedDialChild(
+              child: Icon(Icons.message), label: "Message", onTap: () {}),
+          SpeedDialChild(
+              child: Icon(Icons.camera), label: "Camera", onTap: () {}),
+        ],
       ),
-    );
+    );// إخفاء الزر العائم إذا لم يبدأ الاجتماع
+
+
   }
 
   final JitsiMeet _jitsiMeet = JitsiMeet();
-  final String _serverUrl = "https://8x8.vc/vpaas-magic-cookie-99476734cde9462aa129ec8010493317";
+  final String _serverUrl =
+      "https://8x8.vc/vpaas-magic-cookie-99476734cde9462aa129ec8010493317";
   final String _tenant = "EDU%20FOCUS";
 
   String _generateRoomId() {
-    return 'room_${DateTime.now().millisecondsSinceEpoch}_${Random().nextInt(9999)}';
+    return 'room';
   }
 
   Future<void> _startMeeting() async {
     try {
       final roomId = _generateRoomId();
+
       final options = JitsiMeetConferenceOptions(
         serverURL: _serverUrl,
-        room: "$_tenant/$roomId",
+        room: "$_tenant/$roomId", // Tenant + Room Name
         configOverrides: {
           "startWithAudioMuted": true,
           "startWithVideoMuted": true,
-          "prejoinPageEnabled": false,
-        },
-        featureFlags: {
-          "welcomePage.enabled": false,
-          "resolution": 360,
         },
         userInfo: JitsiMeetUserInfo(
           displayName: "فاطمه (مشرفة)",
@@ -134,49 +159,40 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       );
 
-      final listener = JitsiMeetEventListener(
-        conferenceJoined: (String url) {
-          debugPrint("✅ تم الانضمام إلى الاجتماع: $url");
-        },
+      await _jitsiMeet.join(options, JitsiMeetEventListener());
 
+      // بعد بدء الميتنج، نعرض الزر العائم
+      setState(() {
+        isMeetingStarted = true;
+      });
 
-        conferenceTerminated: (String url, Object? error) {
-          debugPrint("⛔ انتهى الاجتماع: $url");
-          return null;
-        },
-        participantJoined: (email, name, role, participantId) {
-          debugPrint("👤 انضم: $name");
-          return null;
-        },
-      );
+      debugPrint('isMeetingStarted = $isMeetingStarted');
 
-      await _jitsiMeet.join(options, listener);
     } catch (e) {
-      debugPrint("🔥 خطأ عام: ${e.toString()}");
+      debugPrint("خطأ: $e");
     }
   }
 
+// void _openSettings(BuildContext context) {
+//   Navigator.push(
+//     context,
+//     MaterialPageRoute(builder: (context) => ProfileScreen()),
+//   );
+// }
 
-  void _openSettings(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ProfileScreen()),
-    );
-  }
-
-  void _openMeeting(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => OpenMeetingPage()),
-    );
-  }
-
-  void _showChat(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => ConcentrationNotifications()),
-    );
-  }
+// void _openMeeting(BuildContext context) {
+//   Navigator.push(
+//     context,
+//     MaterialPageRoute(builder: (context) => OpenMeetingPage()),
+//   );
+// }
+//
+// void _showChat(BuildContext context) {
+//   Navigator.push(
+//     context,
+//     MaterialPageRoute(builder: (context) => ConcentrationNotifications()),
+//   );
+// }
 }
 
 class HomeIcon extends StatelessWidget {
@@ -237,4 +253,3 @@ class HomeIcon extends StatelessWidget {
     );
   }
 }
-

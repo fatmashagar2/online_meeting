@@ -116,9 +116,14 @@ class _RegisterViewState extends State<RegisterView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                LoginImage(topPadding: 0),
-                // LoginTitle(title: 'REGISTER'),
-
+               // LoginImage(topPadding: 0),
+                const SizedBox(height: 80),
+                Center(
+                  child: Text( 'REGISTER',style: TextStyle(
+                      fontFamily: 'Nosifer',fontSize: 35,color:Color(0xFF2E2E2E)
+                  ),),
+                ),
+                const SizedBox(height: 40),
                 LoginTextField(
                   controller: _nameController,
                   labelText: 'Name',

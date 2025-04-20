@@ -42,10 +42,10 @@ class _LoginViewState extends State<LoginView> {
         );
 
         // إذا كان تسجيل الدخول ناجحًا، انتقل إلى الشاشة الرئيسية
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomeScreen()),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => HomeScreen()),
+        // );
       } on FirebaseAuthException catch (e) {
         // عرض الأخطاء إذا حدث خطأ في تسجيل الدخول
         if (e.code == 'user-not-found') {
@@ -119,7 +119,7 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(txt: "Login", isIconVisible: false,),
+      appBar: CustomAppBar(txt: "Login", isIconVisible: false),
 
       body: SingleChildScrollView(
         child: Padding(
@@ -127,12 +127,17 @@ class _LoginViewState extends State<LoginView> {
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LoginImage(topPadding: 20,),
 
-                // LoginTitle(title: 'LOGIN',),
-                const SizedBox(height: 20),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 80),
+                Center(
+                  child: Text( 'LOGIN',style: TextStyle(
+                    fontFamily: 'Nosifer',fontSize: 40,color:Color(0xFF2E2E2E)
+                  ),),
+                ),
+                const SizedBox(height: 80),
                 LoginTextField(
                   keyboardType: TextInputType.emailAddress,
                   controller: _emailController,
