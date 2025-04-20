@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1078921401711",
+    "project_id": "metting-96269",
+    "storage_bucket": "metting-96269.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1078921401711:android:02a549c4e69529fea3049a",
+        "android_client_info": {
+          "package_name": "com.example.online_meeting"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBvSxwlbq6T8gjHpzWf6TNg8A0qFJSpj_Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

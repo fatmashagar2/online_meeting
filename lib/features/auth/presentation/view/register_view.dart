@@ -7,6 +7,7 @@ import 'widgets/login_image.dart';
 import 'widgets/login_link.dart';
 import 'widgets/login_text_field.dart';
 import 'widgets/login_title.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterView extends StatefulWidget {
   @override
@@ -105,8 +106,8 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(txt: "Register"),
-      backgroundColor: Colors.white,
+      appBar: CustomAppBar(txt: "Register", isIconVisible: false,),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
@@ -115,9 +116,14 @@ class _RegisterViewState extends State<RegisterView> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                LoginImage(topPadding: 0),
-                // LoginTitle(title: 'REGISTER'),
-
+               // LoginImage(topPadding: 0),
+                const SizedBox(height: 80),
+                Center(
+                  child: Text( 'REGISTER',style: TextStyle(
+                      fontFamily: 'Nosifer',fontSize: 35,color:Color(0xFF2E2E2E)
+                  ),),
+                ),
+                const SizedBox(height: 40),
                 LoginTextField(
                   controller: _nameController,
                   labelText: 'Name',
@@ -163,7 +169,50 @@ class _RegisterViewState extends State<RegisterView> {
                 CustomButton(
                   text: 'Register',
                   w: 375,
-                  onPressed: () {},
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      final name = _nameController.text.trim();
+                      final email = _emailController.text.trim();
+                      final phone = _phoneController.text.trim();
+                      final password = _passwordController.text;
+
+
+
+                      try {
+                        final credential = await FirebaseAuth.instance
+                            .createUserWithEmailAndPassword(
+                          email: email,
+                          password: password,
+                        );
+
+                        // ممكن تحفظ اسم المستخدم في FirebaseUser Profile
+                        await credential.user!.updateDisplayName(name);
+
+                        // تسجيل ناجح
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Registered Successfully')),
+                        );
+
+                        // روح لصفحة تانية بعد التسجيل
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => LoginView()),
+                        );
+                      } on FirebaseAuthException catch (e) {
+                        String message = 'Registration failed';
+                        if (e.code == 'email-already-in-use') {
+                          message = 'This email is already in use';
+                        } else if (e.code == 'weak-password') {
+                          message = 'The password is too weak';
+                        }
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text(message)),
+                        );
+                      }
+                    }
+                  },
+
                 ),
                 const SizedBox(height: 20),
                 LoginLink(

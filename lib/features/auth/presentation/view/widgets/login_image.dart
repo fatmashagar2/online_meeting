@@ -10,9 +10,9 @@ class LoginImage extends StatelessWidget {
       padding: EdgeInsets.only(top: topPadding),
       child: Center(
         child: Image.asset(
-          'assets/on2.gif',
-          height: 200,
-          width: 200,
+          'assets/log.gif',
+          height: 250,
+          width: 250,
         ),
       ),
     );

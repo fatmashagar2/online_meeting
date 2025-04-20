@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:online_meeting/features/custom_app_bar.dart';
+
+import '../StudentConcentrationReport.dart';
 
 class ConcentrationNotifications extends StatelessWidget {
   const ConcentrationNotifications({super.key});
@@ -6,90 +9,48 @@ class ConcentrationNotifications extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        leading: const BackButton(color: Colors.black),
-        title: const Text(
-          'Concentration',
-          style: TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        actions: const [
-          IconButton(
-            icon: Icon(Icons.search, color: Colors.black),
-            onPressed: null,
-          ),
-        ],
-      ),
+
+      appBar: CustomAppBar(txt: "Concentration", isIconVisible: false),
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: const [
           NotificationCard(
-            image: 'assets/3.jpg',
-            title: 'High engagement detected in Math class.',
+            image: 'assets/img2.png',
+            title: 'High engagement detected in #14587963.',
             average: '85%',
             time: 'Real-',
             isRecent: true,
           ),
           NotificationCard(
-            image: 'assets/3.jpg',
-            title: 'Low concentration observed in English class.',
+            image: 'assets/img2.png',
+            title: 'Low concentration observed in #15369874.',
             average: '45%',
             time: 'Yesterday',
             isRecent: true,
           ),
           NotificationCard(
-            image: 'assets/3.jpg',
-            title: 'Moderate focus seen in Science class.',
+            image: 'assets/img2.png',
+            title: 'Moderate focus seen in #13698532.',
             average: '65%',
             time: '05/09/2023',
           ),
           NotificationCard(
-            image: 'assets/3.jpg',
-            title: 'High engagement detected in History class.',
+            image: 'assets/img2.png',
+            title: 'High engagement detected in #14785236.',
             average: '80%',
             time: '01/09/2023',
           ),
           NotificationCard(
-            image: 'assets/3.jpg',
-            title: 'Low concentration observed in Geography class.',
+            image: 'assets/img2.png',
+            title: 'Low concentration observed in #12547896.',
             average: '40%',
             time: '31/08/2023',
           ),
           NotificationCard(
-            image: 'assets/3.jpg',
-            title: 'Moderate focus seen in Art class.',
+            image: 'assets/img2.png',
+            title: 'Moderate focus seen in #12365789.',
             average: '60%',
             time: '31/08/2023',
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: Colors.black,
-        unselectedItemColor: Colors.grey,
-        currentIndex: 0,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.search),
-            label: 'Search',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble_outline),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_outline),
-            label: 'Profile',
           ),
         ],
       ),
@@ -115,70 +76,78 @@ class NotificationCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Padding(
-        padding: const EdgeInsets.all(12),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Class Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                image,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => StudentConcentrationReport()));
+      },
+      child: Card(
+        margin: const EdgeInsets.only(bottom: 8),
+        child: Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Class Image
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  image,
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.cover,
+                ),
               ),
-            ),
-            const SizedBox(width: 12),
-            // Content
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  Text(
-                    'Average: $average',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        time,
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+              const SizedBox(width: 12),
+              // Content
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
                       ),
-                      if (isRecent) ...[
-                        const SizedBox(width: 4),
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Colors.green,
-                            shape: BoxShape.circle,
+                    ),
+                    Text(
+                      'Average: $average',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          time,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: Colors.grey[600],
                           ),
                         ),
+                        if (isRecent) ...[
+                          const SizedBox(width: 4),
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

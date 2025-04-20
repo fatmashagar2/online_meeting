@@ -8,8 +8,7 @@ class VerificationScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      appBar: CustomAppBar(txt: 'Email Verification'),
+      appBar: CustomAppBar(txt: 'Email Verification', isIconVisible: false,),
       body: const VerificationBody(),
     );
   }

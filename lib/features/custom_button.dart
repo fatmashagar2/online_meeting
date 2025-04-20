@@ -33,8 +33,8 @@ class CustomButton extends StatelessWidget {
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [
-                  Color(0xff092147),
-                  Color(0xff1E54A6),
+                  Color(0xFF1E1F22),
+                  Color(0xFF1E1F22)
                 ],
                 begin: Alignment.centerLeft,
                 end: Alignment.centerRight,

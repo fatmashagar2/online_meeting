@@ -91,6 +91,7 @@ class OnboardingView extends StatelessWidget {
             title,
             style: const TextStyle(
                 fontSize: 24,
+                color:Colors.black,
                 fontWeight: FontWeight.bold,
                 fontFamily: "Diphylleia"),
           ),
@@ -98,7 +99,7 @@ class OnboardingView extends StatelessWidget {
           Text(
             description,
             textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16, color:Colors.black,),
           ),
           const SizedBox(height: 32),
           Align(
@@ -107,6 +108,7 @@ class OnboardingView extends StatelessWidget {
               child: Text(
                 buttonText,
                 style: TextStyle(
+                    color:Colors.black,
                     fontFamily: "Diphylleia",
                     fontWeight: FontWeight.bold,
                     fontSize: 20),

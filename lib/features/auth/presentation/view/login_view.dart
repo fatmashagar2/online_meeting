@@ -1,4 +1,5 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:online_meeting/features/auth/presentation/view/forget_password_view.dart';
 import 'package:online_meeting/features/auth/presentation/view/widgets/login_image.dart';
@@ -30,6 +31,40 @@ class _LoginViewState extends State<LoginView> {
     super.initState();
     _emailController.addListener(_validateEmail);
     _passwordController.addListener(_validatePassword);
+  }
+  void _login() async {
+    if (_formKey.currentState!.validate()) {
+      try {
+        // محاولة تسجيل الدخول باستخدام Firebase Auth
+        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+        // إذا كان تسجيل الدخول ناجحًا، انتقل إلى الشاشة الرئيسية
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => HomeScreen()),
+        // );
+      } on FirebaseAuthException catch (e) {
+        // عرض الأخطاء إذا حدث خطأ في تسجيل الدخول
+        if (e.code == 'user-not-found') {
+          setState(() {
+            _emailError = 'لا يوجد مستخدم بهذا البريد الإلكتروني';
+          });
+        } else if (e.code == 'wrong-password') {
+          setState(() {
+            _passwordError = 'كلمة المرور غير صحيحة';
+          });
+        } else {
+          // إضافة حالة أخرى في حال حدوث خطأ آخر
+          setState(() {
+            _emailError = 'حدث خطأ أثناء تسجيل الدخول';
+            _passwordError = 'يرجى التحقق من البيانات';
+          });
+        }
+      }
+    }
   }
 
   void _togglePasswordVisibility() {
@@ -84,20 +119,25 @@ class _LoginViewState extends State<LoginView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: CustomAppBar(txt: "Login"),
-      backgroundColor:  Colors.white,
+      appBar: CustomAppBar(txt: "Login", isIconVisible: false),
+
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
             key: _formKey,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                LoginImage(topPadding: 20,),
 
-                // LoginTitle(title: 'LOGIN',),
-                const SizedBox(height: 20),
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 80),
+                Center(
+                  child: Text( 'LOGIN',style: TextStyle(
+                    fontFamily: 'Nosifer',fontSize: 40,color:Color(0xFF2E2E2E)
+                  ),),
+                ),
+                const SizedBox(height: 80),
                 LoginTextField(
                   keyboardType: TextInputType.emailAddress,
                   controller: _emailController,
@@ -126,12 +166,9 @@ class _LoginViewState extends State<LoginView> {
                       child: Text("Forget Password?",)),
                 ),
                 const SizedBox(height: 30),
-                CustomButton(text: 'Login', w: 375, onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => HomeScreen()),
-                  );
-                },),
+                CustomButton(text: 'Login', w: 375, onPressed:
+                  _login
+                ),
                 const SizedBox(height: 20),
                 LoginLink(
                   text:   'Don\'t have an account? Register',

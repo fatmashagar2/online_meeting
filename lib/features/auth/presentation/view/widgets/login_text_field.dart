@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../../../core/themes/theme_provider.dart';
 
 class LoginTextField extends StatelessWidget {
   final TextEditingController controller;
@@ -22,28 +25,30 @@ class LoginTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context); // 🔹 استدعاء ThemeProvider
+
     return TextFormField(
       controller: controller,
       style: TextStyle(
-        color: Color(0xff092147),
+        color: themeProvider.isDarkMode ? Colors.white : Color(0xff092147),
       ),
       obscureText: obscureText,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: const TextStyle(color: Color(0xff092147)),
-        border: const OutlineInputBorder(
+        labelStyle:  TextStyle(color: themeProvider.isDarkMode ? Colors.white :Color(0xff092147)),
+        border:  OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(20)),
-          borderSide: BorderSide(color:  Color(0xff092147)),
+          borderSide: BorderSide(color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
         ),
-        focusedBorder: const OutlineInputBorder(
+        focusedBorder:  OutlineInputBorder(
           borderRadius: BorderRadius.all(Radius.circular(20)),
-          borderSide: BorderSide(color:  Color(0xff092147)),
+          borderSide: BorderSide(color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
         ),
-        prefixIcon: Icon(prefixIcon, color:  Color(0xff092147)),
+        prefixIcon: Icon(prefixIcon, color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
         suffixIcon: suffixIcon != null
             ? IconButton(
-          icon: Icon(suffixIcon, color:  Color(0xff092147)),
+          icon: Icon(suffixIcon,color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
           onPressed: onSuffixIconPressed,
         )
             : null,
