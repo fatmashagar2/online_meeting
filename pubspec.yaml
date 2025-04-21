@@ -79,7 +79,10 @@ dependencies:
   firebase_database: ^11.3.5
   file_picker: ^10.1.2
   path: ^1.9.1
-
+  screenshot: ^3.0.0
+  webview_flutter: ^4.0.0
+  flutter_screen_share: ^0.0.1
+  path_provider: ^2.0.11
 
 
 dev_dependencies:
