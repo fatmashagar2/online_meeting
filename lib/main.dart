@@ -1,100 +1,115 @@
-// //////////////////////////////////////////////////////////////////////////////////////
-// import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:online_meeting/features/custom_button.dart';
-// import 'package:online_meeting/splash/presentation/view/splash_view.dart';
-// import 'package:provider/provider.dart';
-// //import 'package:zego_uikit_prebuilt_video_conference/zego_uikit_prebuilt_video_conference.dart';
-// import 'package:uuid/uuid.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:path/path.dart' as path;
+//////////////////////////////////////////////////////////////////////////////////////
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:online_meeting/features/custom_button.dart';
+import 'package:online_meeting/splash/presentation/view/splash_view.dart';
+import 'package:provider/provider.dart';
+//import 'package:zego_uikit_prebuilt_video_conference/zego_uikit_prebuilt_video_conference.dart';
+import 'package:uuid/uuid.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:path/path.dart' as path;
+
+import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:uuid/uuid.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+import 'core/themes/theme_provider.dart';
+import 'features/auth/presentation/view/login_view.dart';
+import 'features/custom_app_bar.dart';
+import 'features/home/presentation/view/home_view.dart';
+import 'features/profile/presentation/view_model/language_provider.dart';
+import 'package:intl/intl.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'dart:async';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:googleapis_auth/auth_io.dart' as auth;
+import 'package:googleapis/servicecontrol/v1.dart' as servicecontrol;
+
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:online_meeting/features/data_input_screen.dart';
+import 'package:online_meeting/splash/presentation/view/splash_view.dart';
+import 'package:provider/provider.dart';
+import 'core/localization/app_localization.dart';
+import 'core/themes/theme_provider.dart';
+import 'features/StudentConcentrationReport.dart';
+import 'features/auth/presentation/view/login_view.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter/material.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:convert';
+
+import 'features/home/presentation/view/home_view.dart';
+import 'features/meeting_room/presentation/view/meeting_view.dart';
+import 'features/notification/ConcentrationNotifications.dart';
+import 'features/on_boarding/presentation/view/on_boarding_view.dart';
+import 'features/profile/presentation/view_model/language_provider.dart';
+import 'package:firebase_core/firebase_core.dart';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:flutter/material.dart';
+
+import 'package:firebase_core/firebase_core.dart';
+
+import 'package:provider/provider.dart';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:screenshot/screenshot.dart';
+import 'dart:async';
+import 'dart:async';
+import 'dart:io';
+import 'dart:typed_data';
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:screenshot/screenshot.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  // tz.initializeTimeZones(); // مهمة جدًا للتوقيتات
+  final ScreenshotController globalScreenshotController = ScreenshotController();
+
+  await Firebase.initializeApp();
+  // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  //
+  // await requestNotificationPermission();
+  // await saveDeviceToken(); // حفظ التوكن عند بدء التشغيل
+  //
+  //
+  // // await NotificationService.init(); // ضروري
+  // _setupTokenRefresh();
+
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => LanguageProvider()),
+      ],
+      child:
+      Screenshot(
+        controller: globalScreenshotController,child: MyApp()),
+    ),
+  );
+
 //
-// import 'package:flutter/material.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:uuid/uuid.dart';
-// import 'package:firebase_core/firebase_core.dart';
 //
-// import 'core/themes/theme_provider.dart';
-// import 'features/auth/presentation/view/login_view.dart';
-// import 'features/custom_app_bar.dart';
-// import 'features/home/presentation/view/home_view.dart';
-// import 'features/profile/presentation/view_model/language_provider.dart';
-// import 'package:intl/intl.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-// import 'dart:async';
-// import 'package:permission_handler/permission_handler.dart';
-// import 'package:timezone/data/latest.dart' as tz;
-// import 'package:timezone/timezone.dart' as tz;
-// import 'dart:convert';
-// import 'package:http/http.dart' as http;
-// import 'package:googleapis_auth/auth_io.dart' as auth;
-// import 'package:googleapis/servicecontrol/v1.dart' as servicecontrol;
-//
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-// import 'package:online_meeting/features/data_input_screen.dart';
-// import 'package:online_meeting/splash/presentation/view/splash_view.dart';
-// import 'package:provider/provider.dart';
-// import 'core/localization/app_localization.dart';
-// import 'core/themes/theme_provider.dart';
-// import 'features/StudentConcentrationReport.dart';
-// import 'features/auth/presentation/view/login_view.dart';
-// import 'package:flutter_localizations/flutter_localizations.dart';
-// import 'package:flutter/material.dart';
-//
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'dart:convert';
-//
-// import 'features/home/presentation/view/home_view.dart';
-// import 'features/meeting_room/presentation/view/meeting_view.dart';
-// import 'features/notification/ConcentrationNotifications.dart';
-// import 'features/on_boarding/presentation/view/on_boarding_view.dart';
-// import 'features/profile/presentation/view_model/language_provider.dart';
-// import 'package:firebase_core/firebase_core.dart';
-//
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:flutter/material.dart';
-// import 'package:flutter_screenutil/flutter_screenutil.dart';
-//
-// import 'package:provider/provider.dart';
-//
-// import 'package:flutter/material.dart';
-//
-// import 'package:firebase_core/firebase_core.dart';
-//
-// import 'package:provider/provider.dart';
-//
-// // void main() async {
-// //   WidgetsFlutterBinding.ensureInitialized();
-// //   // tz.initializeTimeZones(); // مهمة جدًا للتوقيتات
-// //   //
-// //    await Firebase.initializeApp();
-// //   // FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-// //   //
-// //   // await requestNotificationPermission();
-// //   // await saveDeviceToken(); // حفظ التوكن عند بدء التشغيل
-// //   //
-// //   //
-// //   // // await NotificationService.init(); // ضروري
-// //   // _setupTokenRefresh();
-// //
-// //   runApp(
-// //     MultiProvider(
-// //       providers: [
-// //         ChangeNotifierProvider(create: (context) => ThemeProvider()),
-// //         ChangeNotifierProvider(create: (context) => LanguageProvider()),
-// //       ],
-// //       child: MyApp(),
-// //     ),
-// //   );
-// //
-// // //
-// // //
-// //  }
-//
-//
+ }
+
+
 // ////////////////////////////////////////////////////////////////////////
 // //
 //
@@ -1024,27 +1039,30 @@
 //   checkScheduledNotifications(); // تبدأ مراقبة الوقت عند فتح التطبيق
 // }
 //
-// // import 'package:flutter/material.dart';
-// // import 'package:firebase_core/firebase_core.dart';
-// // import 'package:firebase_storage/firebase_storage.dart';
-// // import 'package:firebase_database/firebase_database.dart';
-// // import 'package:file_picker/file_picker.dart';
-// // import 'dart:io';
+// import 'package:flutter/material.dart';
+// import 'package:firebase_core/firebase_core.dart';
+// import 'package:firebase_storage/firebase_storage.dart';
+// import 'package:firebase_database/firebase_database.dart';
+// import 'package:file_picker/file_picker.dart';
+// import 'package:online_meeting/features/auth/presentation/view/login_view.dart';
+// import 'dart:io';
 //
-// // void main() async {
-// //   WidgetsFlutterBinding.ensureInitialized();
-// //   await Firebase.initializeApp();
-// //   runApp(MyApp());
-// // }
-// //
-// // class MyApp extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return MaterialApp(
-// //       home: UploadVideoScreen(),
-// //     );
-// //   }
-// // }
+// import 'features/home/presentation/view/home_view.dart';
+//
+// void main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//   await Firebase.initializeApp();
+//   runApp(MyApp());
+// }
+//
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: LoginView(),
+//     );
+//   }
+// }
 // //
 // // class UploadVideoScreen extends StatefulWidget {
 // //   @override
@@ -1201,30 +1219,31 @@
 // //     );
 // //   }
 // // }
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     // final themeProvider = Provider.of<ThemeProvider>(context);
-//     // final languageProvider = Provider.of<LanguageProvider>(context);
-//
-//     return ScreenUtilInit(
-//       designSize: Size(375, 812), // Set the design size according to your design
-//       minTextAdapt: true,
-//       splitScreenMode: false,
-//       builder: (context,child) {
-//         return MaterialApp(
-//           debugShowCheckedModeBanner: false,
-//           theme: ThemeData.light(),
-//           darkTheme: ThemeData.dark(),
-//           // themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
-//           // locale: languageProvider.locale,
-//           supportedLocales: [Locale('en'), Locale('ar')],
-//           home: NumberCheckPage(), // Your initial screen
-//         );
-//       },
-//     );
-//   }
-// }
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    // final themeProvider = Provider.of<ThemeProvider>(context);
+    // final languageProvider = Provider.of<LanguageProvider>(context);
+    final ScreenshotController globalScreenshotController = ScreenshotController();
+
+    return ScreenUtilInit(
+      designSize: Size(375, 812), // Set the design size according to your design
+      minTextAdapt: true,
+      splitScreenMode: false,
+      builder: (context,child) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          // themeMode: themeProvider.isDarkMode ? ThemeMode.dark : ThemeMode.light,
+          // locale: languageProvider.locale,
+          supportedLocales: [Locale('en'), Locale('ar')],
+          home: HomeScreen(), // Your initial screen
+        );
+      },
+    );
+  }
+}
 //
 //
 //
@@ -1578,98 +1597,336 @@
 ////////////////////// test notication alerts     ////////
 
 
-import 'dart:convert';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:http/http.dart' as http;
+// import 'dart:async';
+// import 'package:flutter/material.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:flutter/material.dart';
+// import 'package:jitsi_meet_flutter_sdk/jitsi_meet_flutter_sdk.dart';
+//
+// import 'package:flutter/material.dart';
+// import 'package:flutter/material.dart';
+// import 'package:permission_handler/permission_handler.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
+// import 'package:flutter/material.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
+// import 'package:flutter_screen_share/flutter_screen_share.dart';
+//
+// import 'features/home/presentation/view/home_view.dart';  // تأكد من أنك تستخدم المكتبة الصحيحة
 
-final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-FlutterLocalNotificationsPlugin();
+// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+// FlutterLocalNotificationsPlugin();
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+// Future<void> main() async {
+//   WidgetsFlutterBinding.ensureInitialized();
+//
+//   const AndroidInitializationSettings initializationSettingsAndroid =
+//   AndroidInitializationSettings('@mipmap/ic_launcher');
+//
+//   final InitializationSettings initializationSettings =
+//   InitializationSettings(android: initializationSettingsAndroid);
+//
+//   await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+//
+//   runApp(MyApp());
+// }
+//
+// class MyApp extends StatelessWidget {
+//   @override
+//   Widget build(BuildContext context) {
+//     return MaterialApp(
+//       home: JitsiMeetWebViewPage(),
+//     );
+//   }
+// }
+//
 
-  const AndroidInitializationSettings initializationSettingsAndroid =
-  AndroidInitializationSettings('@mipmap/ic_launcher');
 
-  final InitializationSettings initializationSettings =
-  InitializationSettings(android: initializationSettingsAndroid);
+// class JitsiMeetWebViewPage extends StatefulWidget {
+//   @override
+//   _JitsiMeetWebViewPageState createState() => _JitsiMeetWebViewPageState();
+// }
+//
+// class _JitsiMeetWebViewPageState extends State<JitsiMeetWebViewPage> {
+//   late WebViewController _controller;
+//
+//   final String _serverUrl = "https://8x8.vc/vpaas-magic-cookie-cdc1bc8812454841af7f495cccd69fc6";
+//   final String _tenant = "EDU%20FOCUS";
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     requestPermissions();
+//     final roomUrl = _generateMeetingUrl();
+//     _controller = WebViewController()
+//       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+//       ..loadRequest(Uri.parse(roomUrl));
+//   }
+//
+//   String _generateRoomId() {
+//     return 'room'; // يمكن تعديلها لتكون ديناميكية إذا رغبت
+//   }
+//
+//   void requestPermissions() async {
+//     // طلب إذن الكاميرا
+//     PermissionStatus cameraStatus = await Permission.camera.request();
+//
+//     // طلب إذن المايكروفون
+//     PermissionStatus microphoneStatus = await Permission.microphone.request();
+//
+//     // تحقق إذا كان تم منح الأذونات بنجاح
+//     if (cameraStatus.isGranted && microphoneStatus.isGranted) {
+//       print("Camera and Microphone permissions granted");
+//     } else {
+//       // إذا تم رفض الأذونات، يمكن إعلام المستخدم بضرورة تمكين الأذونات من الإعدادات
+//       print("Permissions denied. Please enable camera and microphone permissions.");
+//       // يمكن إضافة تنبيه للمستخدم هنا
+//     }
+//   }
+//
+//   String _generateMeetingUrl() {
+//     final roomId = _generateRoomId();
+//     final fullUrl = '$_serverUrl/$_tenant';
+//     return fullUrl;
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: Text('Jitsi Meet'),
+//       ),
+//       body: WebViewWidget(controller: _controller),
+//     );
+//   }
+// }
+//
+// // Align(
+// // alignment: Alignment(0, .99),
+// // // 0 أفقي (وسط)، 0.99 عمودي (قريبة من تحت)
+// // child: FloatingActionButton(
+// // onPressed: ,
+// // child: Icon(Icons.screen_share),
+// // tooltip: 'مشاركة الشاشة',
+// // ),
+// // ),
+// class FocusNotifierScreen extends StatefulWidget {
+//   @override
+//   _FocusNotifierScreenState createState() => _FocusNotifierScreenState();
+// }
+//
+// class _FocusNotifierScreenState extends State<FocusNotifierScreen> {
+//   List<double> focusLevels = [35, 50, 80, 45, 20, 75]; // دي النسب اللي هتمشي عليهم
+//   int currentIndex = 0;
+//   Timer? focusTimer;
+//
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     startFocusNotifications();
+//   }
+//
+//   @override
+//   void dispose() {
+//     focusTimer?.cancel();
+//     super.dispose();
+//   }
+//
+//   void startFocusNotifications() {
+//     focusTimer = Timer.periodic(Duration(minutes: 5), (timer) {
+//       if (currentIndex < focusLevels.length) {
+//         _checkFocusAndNotify(focusLevels[currentIndex]);
+//         currentIndex++;
+//       } else {
+//         timer.cancel(); // خلصنا الليست
+//       }
+//     });
+//   }
+//
+//   Future<void> _showNotification(String title, String body) async {
+//     const AndroidNotificationDetails androidPlatformChannelSpecifics =
+//     AndroidNotificationDetails(
+//       'focus_channel',
+//       'Focus Alerts',
+//       importance: Importance.max,
+//       priority: Priority.high,
+//     );
+//
+//     const NotificationDetails platformChannelSpecifics =
+//     NotificationDetails(android: androidPlatformChannelSpecifics);
+//
+//     await flutterLocalNotificationsPlugin.show(
+//       0,
+//       title,
+//       body,
+//       platformChannelSpecifics,
+//     );
+//   }
+//
+//   void _checkFocusAndNotify(double focus) {
+//     if (focus < 40) {
+//       _showNotification("ركز يلا! 👀", "نسبة تركيزك واطية، صحصح كده 💡");
+//     } else if (focus >= 40 && focus <= 70) {
+//       _showNotification("تمام كده 👍", "أداءك كويس، استمر بنفس القوة!");
+//     } else if (focus > 70) {
+//       _showNotification("عاش 💪", "أداء ممتاز، خليك كده دايمًا!");
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(title: Text("Focus Auto Checker")),
+//       body: Center(
+//         child: Text(
+//           "هيتم إرسال إشعارات كل 5 دقايق حسب نسبة التركيز",
+//           textAlign: TextAlign.center,
+//           style: TextStyle(fontSize: 18),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
-  await flutterLocalNotificationsPlugin.initialize(initializationSettings);
 
-  runApp(MyApp());
-}
-class MyApp extends StatelessWidget {
+
+class ScreenshotPage extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: FocusNotifierScreen(),
-    );
-  }
+  _ScreenshotPageState createState() => _ScreenshotPageState();
 }
 
-class FocusNotifierScreen extends StatefulWidget {
+class _ScreenshotPageState extends State<ScreenshotPage> {
+  final ScreenshotController _screenshotController = ScreenshotController();
+  late Timer _timer;
+
   @override
-  _FocusNotifierScreenState createState() => _FocusNotifierScreenState();
-}
-
-class _FocusNotifierScreenState extends State<FocusNotifierScreen> {
-  final TextEditingController _controller = TextEditingController();
-
-  Future<void> _showNotification(String title, String body) async {
-    const AndroidNotificationDetails androidPlatformChannelSpecifics =
-    AndroidNotificationDetails(
-      'focus_channel',
-      'Focus Alerts',
-      importance: Importance.max,
-      priority: Priority.high,
-    );
-
-    const NotificationDetails platformChannelSpecifics =
-    NotificationDetails(android: androidPlatformChannelSpecifics);
-
-    await flutterLocalNotificationsPlugin.show(
-      0,
-      title,
-      body,
-      platformChannelSpecifics,
-    );
+  void initState() {
+    super.initState();
+    _requestPermission();
+    _timer = Timer.periodic(Duration(seconds: 600), _captureScreenshot);
   }
 
-  void _checkFocusAndNotify(String value) {
-    final focus = double.tryParse(value);
-    if (focus == null) return;
+  Future<void> _requestPermission() async {
+    await [
+      Permission.storage,
+      Permission.manageExternalStorage, // للأندرويد 11 وما فوق
+    ].request();
+  }
 
-    if (focus < 40) {
-      _showNotification("انتباه!", "نسبة تركيزك منخفضة، ركّز شوية 💡");
-    } else if (focus >= 40 && focus <= 70) {
-      _showNotification("تمام 👍", "أداءك متوسط، استمر كده!");
-    } else if (focus > 70) {
-      _showNotification("حماسك زايد 🔥", "ركز أقل شوية، خليك هادي ومتزن.");
+  Future<void> _captureScreenshot(Timer timer) async {
+    final image = await _screenshotController.capture();
+
+    if (image != null) {
+      final directory = await getExternalStorageDirectory();
+      final screenshotsFolder = Directory("${directory!.path}/Pictures/screenshots_flutter");
+      if (!await screenshotsFolder.exists()) {
+        await screenshotsFolder.create(recursive: true);
+      }
+
+      final fileName = "screenshot_${DateTime.now().millisecondsSinceEpoch}.png";
+      final filePath = "${screenshotsFolder.path}/$fileName";
+      final file = File(filePath);
+
+      await file.writeAsBytes(image);
+
+      print("✅ تم حفظ الصورة في: $filePath");
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("📸 تم حفظ الصورة في ملفات الموبايل")),
+      );
+    } else {
+      print("❌ فشل في التقاط الصورة");
     }
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Focus Checker")),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: TextFormField(
-          controller: _controller,
-          keyboardType: TextInputType.number,
-          decoration: InputDecoration(
-            labelText: 'اكتب نسبة تركيزك',
-            border: OutlineInputBorder(),
+      appBar: AppBar(title: Text("Screenshot كل 5 ثواني")),
+      body: Screenshot(
+        controller: _screenshotController,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.camera_alt, size: 70, color: Colors.blue),
+              SizedBox(height: 20),
+              Text("📸 يتم حفظ صورة كل 5 ثواني في مجلد الملفات"),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ImageListPage()),
+                  );
+                },
+                child: Text("عرض الصور الملتقطة"),
+              ),
+            ],
           ),
-          onFieldSubmitted: _checkFocusAndNotify,
         ),
       ),
     );
   }
 }
+
+class ImageListPage extends StatelessWidget {
+  Future<List<File>> _getImages() async {
+    final directory = await getExternalStorageDirectory();
+    final screenshotsFolder = Directory("${directory!.path}/Pictures/screenshots_flutter");
+
+    if (!await screenshotsFolder.exists()) {
+      return [];
+    }
+
+    final files = screenshotsFolder.listSync();
+    return files.whereType<File>().toList();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text("الصور الملتقطة")),
+      body: FutureBuilder<List<File>>(
+        future: _getImages(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('حدث خطأ!'));
+          }
+
+          final images = snapshot.data ?? [];
+
+          if (images.isEmpty) {
+            return Center(child: Text('لا توجد صور بعد.'));
+          }
+
+          return ListView.builder(
+            itemCount: images.length,
+            itemBuilder: (context, index) {
+              final image = images[index];
+              return CircleAvatar(
+                radius:150,
+                child: Image.file(image),
+
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+
 
 
