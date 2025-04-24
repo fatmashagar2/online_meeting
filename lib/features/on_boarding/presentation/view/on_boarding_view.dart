@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../../../auth/presentation/view/login_view.dart';
 
 class OnboardingView extends StatelessWidget {
   final PageController _pageController = PageController();
@@ -15,7 +18,7 @@ class OnboardingView extends StatelessWidget {
             controller: _pageController,
             children: <Widget>[
               buildPage(
-                image: 'assets/on1.gif',
+                image: 'assets/82a5b870b79524369da915857971fa6e.gif',
                 title: 'Welcome to EDU Focus',
                 description:
                 'We provide you with a unique educational experience through online meetings',
@@ -27,7 +30,7 @@ class OnboardingView extends StatelessWidget {
                 },
               ),
               buildPage(
-                image: 'assets/on2.gif',
+                image: 'assets/Hope For Tomorrow.gif',
                 title: 'Increases concentration',
                 description:
                 'Our app uses advanced technology to measure students concentration levels during lessons through their interactions and responses',
@@ -39,16 +42,15 @@ class OnboardingView extends StatelessWidget {
                 },
               ),
               buildPage(
-                image: 'assets/on3.gif',
+                image: 'assets/876f9c5858d664d0efa0c476db65ef87.gif',
                 title: 'Provide you a Report',
                 description:
                 'rack your performance and progress with detailed reports provided by AI technology',
-                buttonText: 'NEXT',
+                buttonText: 'Next',
                 buttonAction: () {
-                  _pageController.nextPage(
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeIn);
+                  finishOnboarding(context);
                 },
+
               ),
             ],
           ),
@@ -105,18 +107,30 @@ class OnboardingView extends StatelessWidget {
           Align(
             alignment: Alignment.topRight,
             child: InkWell(
+              onTap: buttonAction,
               child: Text(
                 buttonText,
                 style: TextStyle(
-                    color:Colors.black,
-                    fontFamily: "Diphylleia",
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20),
+                  color: Colors.black,
+                  fontFamily: "Diphylleia",
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
               ),
             ),
+
           ),
         ],
       ),
+    );
+  }
+
+  void finishOnboarding(BuildContext context) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFirstTime', false); // مهم جدًا
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) =>  LoginView()),
     );
   }
 }

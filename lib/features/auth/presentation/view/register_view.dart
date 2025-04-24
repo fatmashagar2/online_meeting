@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:online_meeting/features/auth/presentation/view/login_view.dart';
 import 'package:online_meeting/features/custom_app_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../main.dart';
 import '../../../custom_button.dart';
 import 'widgets/login_image.dart';
@@ -118,11 +121,7 @@ class _RegisterViewState extends State<RegisterView> {
               children: [
                // LoginImage(topPadding: 0),
                 const SizedBox(height: 80),
-                Center(
-                  child: Text( 'REGISTER',style: TextStyle(
-                      fontFamily: 'Nosifer',fontSize: 35,color:Color(0xFF2E2E2E)
-                  ),),
-                ),
+              WavyLoginText(),
                 const SizedBox(height: 40),
                 LoginTextField(
                   controller: _nameController,
@@ -176,8 +175,6 @@ class _RegisterViewState extends State<RegisterView> {
                       final phone = _phoneController.text.trim();
                       final password = _passwordController.text;
 
-
-
                       try {
                         final credential = await FirebaseAuth.instance
                             .createUserWithEmailAndPassword(
@@ -185,15 +182,16 @@ class _RegisterViewState extends State<RegisterView> {
                           password: password,
                         );
 
-                        // ممكن تحفظ اسم المستخدم في FirebaseUser Profile
                         await credential.user!.updateDisplayName(name);
 
-                        // تسجيل ناجح
+                        // حفظ الاسم في SharedPreferences
+                        final prefs = await SharedPreferences.getInstance();
+                       await prefs.setString('displayName', name); // خزّن الاسم
+
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Registered Successfully')),
                         );
 
-                        // روح لصفحة تانية بعد التسجيل
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => LoginView()),
@@ -228,6 +226,77 @@ class _RegisterViewState extends State<RegisterView> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+
+
+class WavyLoginText extends StatefulWidget {
+  const WavyLoginText({super.key});
+
+  @override
+  State<WavyLoginText> createState() => _WavyLoginTextState();
+}
+
+
+class _WavyLoginTextState extends State<WavyLoginText> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  final String text = 'REGISTER';
+  late List<Animation<double>> _animations;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    )..repeat(reverse: true);
+
+    _animations = List.generate(text.length, (index) {
+      final start = index * 0.1;
+      final end = min(start + 0.5, 1.0); // ← هنا بيتأكد إن end مش أكبر من 1.0
+
+      return Tween<double>(begin: 0.0, end: -10.0).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(start, end, curve: Curves.easeInOut),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(text.length, (index) {
+          return AnimatedBuilder(
+            animation: _animations[index],
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(0, _animations[index].value),
+                child: child,
+              );
+            },
+            child: Text(
+              text[index],
+              style: const TextStyle(
+                fontFamily: 'Nosifer',
+                fontSize: 40,
+                color: Color(0xFF2E2E2E),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }

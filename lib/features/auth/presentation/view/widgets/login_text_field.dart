@@ -27,32 +27,34 @@ class LoginTextField extends StatelessWidget {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context); // 🔹 استدعاء ThemeProvider
 
-    return TextFormField(
-      controller: controller,
-      style: TextStyle(
-        color: themeProvider.isDarkMode ? Colors.white : Color(0xff092147),
-      ),
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: labelText,
-        labelStyle:  TextStyle(color: themeProvider.isDarkMode ? Colors.white :Color(0xff092147)),
-        border:  OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          borderSide: BorderSide(color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
+    return MaterialApp(debugShowCheckedModeBanner: false,
+      home: TextFormField(
+        controller: controller,
+        style: TextStyle(
+          color: themeProvider.isDarkMode ? Colors.white : Color(0xff092147),
         ),
-        focusedBorder:  OutlineInputBorder(
-          borderRadius: BorderRadius.all(Radius.circular(20)),
-          borderSide: BorderSide(color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
+        obscureText: obscureText,
+        keyboardType: keyboardType,
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle:  TextStyle(color: themeProvider.isDarkMode ? Colors.white :Color(0xff092147)),
+          border:  OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+            borderSide: BorderSide(color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
+          ),
+          focusedBorder:  OutlineInputBorder(
+            borderRadius: BorderRadius.all(Radius.circular(20)),
+            borderSide: BorderSide(color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
+          ),
+          prefixIcon: Icon(prefixIcon, color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
+          suffixIcon: suffixIcon != null
+              ? IconButton(
+            icon: Icon(suffixIcon,color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
+            onPressed: onSuffixIconPressed,
+          )
+              : null,
+          errorText: errorText,
         ),
-        prefixIcon: Icon(prefixIcon, color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
-        suffixIcon: suffixIcon != null
-            ? IconButton(
-          icon: Icon(suffixIcon,color: themeProvider.isDarkMode ? Colors.white :  Color(0xff092147)),
-          onPressed: onSuffixIconPressed,
-        )
-            : null,
-        errorText: errorText,
       ),
     );
   }
