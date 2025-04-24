@@ -12,6 +12,7 @@ import 'package:online_meeting/features/home/presentation/view/home_view.dart';
 
 import '../../../../main.dart';
 import '../../../custom_button.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -42,10 +43,15 @@ class _LoginViewState extends State<LoginView> {
         );
 
         // إذا كان تسجيل الدخول ناجحًا، انتقل إلى الشاشة الرئيسية
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => HomeScreen()),
-        // );
+        // إذا كان تسجيل الدخول ناجحًا، احفظ الحالة وانتقل إلى الشاشة الرئيسية
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setBool('isLoggedIn', true);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+
       } on FirebaseAuthException catch (e) {
         // عرض الأخطاء إذا حدث خطأ في تسجيل الدخول
         if (e.code == 'user-not-found') {
@@ -132,11 +138,7 @@ class _LoginViewState extends State<LoginView> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 80),
-                Center(
-                  child: Text( 'LOGIN',style: TextStyle(
-                    fontFamily: 'Nosifer',fontSize: 40,color:Color(0xFF2E2E2E)
-                  ),),
-                ),
+                WavyLoginText(),
                 const SizedBox(height: 80),
                 LoginTextField(
                   keyboardType: TextInputType.emailAddress,
@@ -157,15 +159,15 @@ class _LoginViewState extends State<LoginView> {
                   errorText: _passwordError,
                 ),
                 const SizedBox(height: 20),
-                InkWell(
-                  onTap: (){
-                    Navigator.push(context, MaterialPageRoute(builder: (context)=>ForgotPasswordScreen()));
-                  },
-                  child: Align(
-                      alignment: Alignment.topRight,
-                      child: Text("Forget Password?",)),
-                ),
-                const SizedBox(height: 30),
+                // InkWell(
+                //   onTap: (){
+                //     Navigator.push(context, MaterialPageRoute(builder: (context)=>ForgotPasswordScreen()));
+                //   },
+                //   child: Align(
+                //       alignment: Alignment.topRight,
+                //       child: Text("Forget Password?",)),
+                // ),
+                // const SizedBox(height: 30),
                 CustomButton(text: 'Login', w: 375, onPressed:
                   _login
                 ),
@@ -183,6 +185,73 @@ class _LoginViewState extends State<LoginView> {
             ),
           ),
         ),
+      ),
+    );
+  }
+}
+class WavyLoginText extends StatefulWidget {
+  const WavyLoginText({super.key});
+
+  @override
+  State<WavyLoginText> createState() => _WavyLoginTextState();
+}
+
+
+class _WavyLoginTextState extends State<WavyLoginText> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  final String text = 'LOGIN';
+  late List<Animation<double>> _animations;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 1200), // 🔥 أسرع
+      vsync: this,
+    )..repeat(reverse: true);
+
+    _animations = List.generate(text.length, (index) {
+      final start = index * 0.1;
+      final end = start + 0.5;
+      return Tween<double>(begin: 0.0, end: -10.0).animate(
+        CurvedAnimation(
+          parent: _controller,
+          curve: Interval(start, end, curve: Curves.easeInOut),
+        ),
+      );
+    });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(text.length, (index) {
+          return AnimatedBuilder(
+            animation: _animations[index],
+            builder: (context, child) {
+              return Transform.translate(
+                offset: Offset(0, _animations[index].value),
+                child: child,
+              );
+            },
+            child: Text(
+              text[index],
+              style: const TextStyle(
+                fontFamily: 'Nosifer',
+                fontSize: 40,
+                color: Color(0xFF2E2E2E),
+              ),
+            ),
+          );
+        }),
       ),
     );
   }
