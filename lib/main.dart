@@ -93,10 +93,14 @@ import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:shared_preferences/shared_preferences.dart';import 'package:audioplayers/audioplayers.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter_sha_fingerprint/flutter_sha_fingerprint.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await FlutterShaFingerprint.getFingerprints();
+
   SharedPreferences prefs = await SharedPreferences.getInstance();
   bool? seenOnboarding = prefs.getBool('isFirstTime');
 

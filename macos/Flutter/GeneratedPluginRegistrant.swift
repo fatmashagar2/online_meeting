@@ -17,6 +17,7 @@ import firebase_storage
 import flutter_local_notifications
 import flutter_localization
 import flutter_screen_capture
+import google_sign_in_ios
 import path_provider_foundation
 import screen_capture
 import screen_retriever_macos
@@ -38,6 +39,7 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FlutterLocalNotificationsPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalNotificationsPlugin"))
   FlutterLocalizationPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalizationPlugin"))
   FlutterScreenCapturePlugin.register(with: registry.registrar(forPlugin: "FlutterScreenCapturePlugin"))
+  FLTGoogleSignInPlugin.register(with: registry.registrar(forPlugin: "FLTGoogleSignInPlugin"))
   PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
   FlutterScreenCapturePlugin.register(with: registry.registrar(forPlugin: "FlutterScreenCapturePlugin"))
   ScreenRetrieverMacosPlugin.register(with: registry.registrar(forPlugin: "ScreenRetrieverMacosPlugin"))
