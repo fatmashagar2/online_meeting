@@ -46,6 +46,8 @@ dependencies:
   flutter_screenutil: ^5.9.3
   firebase_dynamic_links: ^6.0.11
   image_picker: ^1.1.2
+  audioplayers: ^6.4.0
+
 
   flutter_bloc: ^8.1.6
   shared_preferences: ^2.3.5
@@ -82,9 +84,10 @@ dependencies:
   path: ^1.9.1
   screenshot: ^3.0.0
   webview_flutter: ^4.0.0
-  flutter_screen_share: ^0.0.1
+
   path_provider: ^2.0.11
   camera: ^0.11.1
+  animated_text_kit: ^4.2.3
 
 
 dev_dependencies:
@@ -119,6 +122,8 @@ flutter:
     - assets/log.gif
     - assets/lang/en.json
     - assets/lang/ar.json
+    - assets/mixkit-mouse-click-close-1113.wav
+    - assets/sec_mixdown-62016.mp3
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
