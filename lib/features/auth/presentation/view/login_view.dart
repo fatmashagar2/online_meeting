@@ -13,6 +13,8 @@ import 'package:online_meeting/features/home/presentation/view/home_view.dart';
 import '../../../../main.dart';
 import '../../../custom_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -70,6 +72,40 @@ class _LoginViewState extends State<LoginView> {
           });
         }
       }
+    }
+  }
+
+  Future<UserCredential?> signInWithGoogle() async {
+    try {
+      // Trigger the authentication flow
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+      if (googleUser == null) {
+        // المستخدم لغى عملية تسجيل الدخول
+        return null;
+      }
+
+      // Obtain the auth details from the request
+      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+
+      // Create a new credential
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      print('Success');
+
+      // Once signed in, return the UserCredential
+      UserCredential userCredential = await FirebaseAuth.instance.signInWithCredential(credential);
+
+      // حفظ حالة تسجيل الدخول في SharedPreferences
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', true);
+
+      return userCredential;
+    } catch (e) {
+      print('Error signing in with Google: $e');
+      return null;
     }
   }
 
@@ -171,6 +207,20 @@ class _LoginViewState extends State<LoginView> {
                 CustomButton(text: 'Login', w: 375, onPressed:
                   _login
                 ),
+                const SizedBox(height: 20),
+                CustomButton(
+                  text: 'Login With Google',
+                  w: 375,
+                  onPressed: () async {
+                    final userCredential = await signInWithGoogle();
+                    if (userCredential != null) {
+                      Navigator.push(context, MaterialPageRoute(builder: (context)=>HomeScreen())); // غيري '/home' لو اسم الراوت مختلف
+                    } else {
+                      print('Login cancelled or failed');
+                    }
+                  },
+                ),
+
                 const SizedBox(height: 20),
                 LoginLink(
                   text:   'Don\'t have an account? Register',
