@@ -15,7 +15,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:flutter_screen_share/flutter_screen_share.dart';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:path/path.dart' as path;
@@ -94,7 +93,7 @@ import 'package:camera/camera.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:screenshot/screenshot.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shared_preferences/shared_preferences.dart';import 'package:audioplayers/audioplayers.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -1296,6 +1295,8 @@ class MyApp extends StatelessWidget {
 //
 //
 
+
+
 class CreateQuestionScreen extends StatefulWidget {
   @override
   _CreateQuestionScreenState createState() => _CreateQuestionScreenState();
@@ -1305,50 +1306,95 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
   final _questionController = TextEditingController();
   final _optionsController = TextEditingController();
   final _correctAnswerController = TextEditingController();
-  DateTime? _selectedDateTime;
+  final _durationController = TextEditingController(); // ده الجديد
 
-  @override
-  void initState() {
-    super.initState();
-  }
+  List<Map<String, dynamic>> _questions = [];
 
-  Future<void> _createQuestion() async {
+  void _addQuestion() {
     final questionText = _questionController.text;
-    final options =
-        _optionsController.text.split(",").map((e) => e.trim()).toList();
+    final options = _optionsController.text.split(",").map((e) => e.trim()).toList();
     final correctAnswer = _correctAnswerController.text;
 
     if (questionText.isEmpty || options.length < 2 || correctAnswer.isEmpty) {
-      _showErrorMessage('Please fill all fields and choose a time');
+      _showErrorMessage('Please fill all fields correctly');
       return;
     }
 
-    try {
-      await FirebaseFirestore.instance.collection('questionnaire').add({
+    _questions.add({
+      'questionText': questionText,
+      'options': options,
+      'correctAnswer': correctAnswer,
+    });
+
+    _clearQuestionFields();
+
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text('Question added! You can add another one.'),
+    ));
+  }
+
+  Future<void> _saveQuestions() async {
+    if (_questionController.text.isNotEmpty &&
+        _optionsController.text.isNotEmpty &&
+        _correctAnswerController.text.isNotEmpty) {
+      final questionText = _questionController.text;
+      final options = _optionsController.text.split(",").map((e) => e.trim()).toList();
+      final correctAnswer = _correctAnswerController.text;
+
+      if (options.length < 2) {
+        _showErrorMessage('Please provide at least two options.');
+        return;
+      }
+
+      _questions.add({
         'questionText': questionText,
         'options': options,
         'correctAnswer': correctAnswer,
       });
 
-      _clearFields();
+      _clearQuestionFields();
+    }
+
+    if (_questions.isEmpty) {
+      _showErrorMessage('Please add at least one question before saving.');
+      return;
+    }
+
+    if (_durationController.text.isEmpty) {
+      _showErrorMessage('Please enter the quiz duration.');
+      return;
+    }
+
+    try {
+      // نعمل مستند للكويز و نحفظ فيه الوقت وتاريخ الإنشاء
+      final quizDoc = await FirebaseFirestore.instance.collection('quizzes').add({
+        'duration': int.parse(_durationController.text),
+        'createdAt': Timestamp.now(),
+      });
+
+      // نضيف الأسئلة جوه كوليكشن فرعي
+      for (var question in _questions) {
+        await quizDoc.collection('questions').add(question);
+      }
+
+      _questions.clear();
+      _durationController.clear();
 
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Question saved successfully'),
+        content: Text('Quiz and questions saved successfully!'),
       ));
+
       Navigator.push(context,
           MaterialPageRoute(builder: (context) => ScheduleNotificationPage()));
     } catch (e) {
-      _showErrorMessage('Error saving question: $e');
+      _showErrorMessage('Error saving quiz: $e');
     }
   }
 
-  void _clearFields() {
+  void _clearQuestionFields() {
     _questionController.clear();
     _optionsController.clear();
     _correctAnswerController.clear();
-    setState(() {
-      _selectedDateTime = null;
-    });
   }
 
   void _showErrorMessage(String message) {
@@ -1367,6 +1413,7 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
         padding: const EdgeInsets.all(20),
         child: Column(
           children: [
+
             _buildTextField(_questionController, 'Enter question'),
             SizedBox(height: 10),
             _buildTextField(
@@ -1374,19 +1421,19 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
             SizedBox(height: 10),
             _buildTextField(_correctAnswerController, 'Enter correct answer'),
             SizedBox(height: 20),
-
+            _buildTextField(_durationController, 'Enter quiz duration (in minutes)'),
+            SizedBox(height: 100),
+            CustomButton(
+              text: 'Add Question',
+              w: 450,
+              onPressed: _addQuestion,
+            ),
             SizedBox(height: 20),
             CustomButton(
-                text: 'Save Question', w: 300, onPressed: _createQuestion),
-            // ElevatedButton.icon(
-            //   onPressed: _createQuestion,
-            //   icon: Icon(Icons.save),
-            //   label: Text('Save Question'),
-            //   style: ElevatedButton.styleFrom(
-            //     backgroundColor: Colors.deepPurple,
-            //     padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
-            //   ),
-            // ),
+              text: 'Save All Questions',
+              w: 450,
+              onPressed: _saveQuestions,
+            ),
           ],
         ),
       ),
@@ -1396,6 +1443,7 @@ class _CreateQuestionScreenState extends State<CreateQuestionScreen> {
   Widget _buildTextField(TextEditingController controller, String label) {
     return TextField(
       controller: controller,
+      keyboardType: label.contains('minutes') ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(
@@ -1522,7 +1570,7 @@ class _ScheduleNotificationPageState extends State<ScheduleNotificationPage> {
     if (time == null) return;
 
     final fullDateTime =
-        DateTime(date.year, date.month, date.day, time.hour, time.minute);
+    DateTime(date.year, date.month, date.day, time.hour, time.minute);
     setState(() {
       scheduledDate = fullDateTime;
     });
@@ -1599,7 +1647,7 @@ class _ScheduleNotificationPageState extends State<ScheduleNotificationPage> {
                 filled: true,
                 fillColor: Colors.grey[100],
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
             ),
             SizedBox(
@@ -1624,7 +1672,7 @@ class _ScheduleNotificationPageState extends State<ScheduleNotificationPage> {
                 filled: true,
                 fillColor: Colors.grey[100],
                 contentPadding:
-                    EdgeInsets.symmetric(vertical: 16, horizontal: 12),
+                EdgeInsets.symmetric(vertical: 16, horizontal: 12),
               ),
             ),
             SizedBox(height: 20),
@@ -1665,96 +1713,255 @@ class _ScheduleNotificationPageState extends State<ScheduleNotificationPage> {
   }
 }
 
+
+
+
 class QuizScreen extends StatefulWidget {
   @override
   _QuizScreenState createState() => _QuizScreenState();
 }
 
-class _QuizScreenState extends State<QuizScreen> {
-  int _currentIndex = 0;
-  String? _selectedOption;
+class _QuizScreenState extends State<QuizScreen> with SingleTickerProviderStateMixin {
+  Map<int, String?> _selectedOptions = {};
   List<DocumentSnapshot> _questions = [];
+  Timer? _timer;
+  int _remainingSeconds = 0;
+  int _totalSeconds = 0;
+  bool _submitted = false;
+
+  late AnimationController _pulseController;
+  late Animation<double> _pulseAnimation;
+
+  final AudioPlayer _audioPlayer = AudioPlayer();
 
   @override
   void initState() {
     super.initState();
     _fetchQuestions();
+
+    _pulseController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 500),
+      lowerBound: 0.95,
+      upperBound: 1.05,
+    )..addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _pulseController.reverse();
+      } else if (status == AnimationStatus.dismissed) {
+        _pulseController.forward();
+      }
+    });
+
+    _pulseAnimation = _pulseController.drive(Tween(begin: 1.0, end: 1.05));
   }
 
   Future<void> _fetchQuestions() async {
-    final snapshot =
-        await FirebaseFirestore.instance.collection('questionnaire').get();
-    setState(() {
-      _questions = snapshot.docs;
+    final snapshot = await FirebaseFirestore.instance
+        .collection('quizzes')
+        .orderBy('createdAt', descending: true)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isNotEmpty) {
+      final quizDoc = snapshot.docs.first;
+      final questionsSnapshot = await quizDoc.reference.collection('questions').get();
+
+      setState(() {
+        _questions = questionsSnapshot.docs;
+        _remainingSeconds = (quizDoc['duration'] ?? 1) * 60;
+        _totalSeconds = _remainingSeconds;
+      });
+
+      _startTimer();
+    }
+  }
+
+  void _startTimer() {
+    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (_remainingSeconds == 0) {
+        _submitAnswers();
+        timer.cancel();
+      } else {
+        setState(() {
+          _remainingSeconds--;
+
+          if (_remainingSeconds <= 5 && !_pulseController.isAnimating) {
+            _pulseController.forward();
+          }
+        });
+      }
     });
   }
 
-  void _nextQuestion() {
-    if (_currentIndex < _questions.length - 1) {
-      setState(() {
-        _currentIndex++;
-        _selectedOption = null;
-      });
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('You have completed the quiz!')),
-      );
+  void _submitAnswers() {
+    if (_timer != null) {
+      _timer!.cancel();
     }
+    setState(() {
+      _submitted = true;
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    _pulseController.dispose();
+    super.dispose();
+  }
+
+  String _formatTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final remainingSeconds = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${remainingSeconds.toString().padLeft(2, '0')}';
   }
 
   @override
   Widget build(BuildContext context) {
     if (_questions.isEmpty) {
       return Scaffold(
-        appBar:CustomAppBar(txt: 'Quiz', isIconVisible: false),
+        appBar: AppBar(title: Text('Quiz')),
         body: Center(child: CircularProgressIndicator()),
       );
     }
 
-    final questionData = _questions[_currentIndex];
-    final questionText = questionData['questionText'];
-    final options = List<String>.from(questionData['options']);
-    final correctAnswer = questionData['correctAnswer'];
+    double progress = (_totalSeconds - _remainingSeconds) / _totalSeconds;
+    Color progressColor = _remainingSeconds <= 30 ? Colors.red : Colors.green;
 
     return Scaffold(
-      appBar: CustomAppBar(txt: 'Quiz', isIconVisible: false),
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Q${_currentIndex + 1}: $questionText",
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      backgroundColor: Colors.grey[100],
+      appBar: CustomAppBar(txt: "Quiz", isIconVisible: false),
+      body: Column(
+        children: [
+          SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              children: [
+                AnimatedContainer(
+                  duration: Duration(milliseconds: 500),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      backgroundColor: Colors.grey[300],
+                      color: progressColor,
+                      minHeight: 12,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 8),
+                ScaleTransition(
+                  scale: _remainingSeconds <= 5 ? _pulseAnimation : AlwaysStoppedAnimation(1.0),
+                  child: AnimatedDefaultTextStyle(
+                    duration: Duration(milliseconds: 500),
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: progressColor,
+                    ),
+                    child: Text('Time Remaining: ${_formatTime(_remainingSeconds)}'),
+                  ),
+                ),
+              ],
             ),
-            SizedBox(height: 20),
-            ...options.map((option) {
-              return RadioListTile<String>(
-                title: Text(option),
-                value: option,
-                groupValue: _selectedOption,
-                onChanged: (value) {
-                  setState(() {
-                    _selectedOption = value;
-                  });
-                },
-              );
-            }).toList(),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _selectedOption == null
-                  ? null
-                  : () {
-                      bool isCorrect = _selectedOption == correctAnswer;
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                        content: Text(isCorrect ? 'Correct!' : 'Wrong answer!'),
-                        duration: Duration(seconds: 1),
-                      ));
-                      Future.delayed(Duration(seconds: 1), _nextQuestion);
-                    },
-              child: Text("Submit"),
-            )
-          ],
+          ),
+          SizedBox(height: 20),
+          Expanded(
+            child: ListView.builder(
+              itemCount: _questions.length,
+              itemBuilder: (context, index) {
+                final questionData = _questions[index].data() as Map<String, dynamic>;
+                final questionText = questionData['questionText'];
+                final options = List<String>.from(questionData['options']);
+                final correctAnswer = questionData['correctAnswer'];
+                final selected = _selectedOptions[index];
+
+                bool isCorrect = selected == correctAnswer;
+
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                  child: Card(
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    elevation: 5,
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  "Q${index + 1}: $questionText",
+                                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                                ),
+                              ),
+                              if (_submitted)
+                                Icon(
+                                  selected == null
+                                      ? Icons.help_outline
+                                      : isCorrect
+                                      ? Icons.check_circle
+                                      : Icons.cancel,
+                                  color: selected == null
+                                      ? Colors.grey
+                                      : isCorrect
+                                      ? Colors.green
+                                      : Colors.red,
+                                ),
+                            ],
+                          ),
+                          SizedBox(height: 12),
+                          ...options.map((option) {
+                            return RadioListTile<String>(
+                              activeColor: Colors.deepPurple,
+                              title: Text(
+                                option,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: _submitted
+                                      ? option == correctAnswer
+                                      ? Colors.green
+                                      : option == selected
+                                      ? Colors.red
+                                      : Colors.black
+                                      : Colors.black,
+                                ),
+                              ),
+                              value: option,
+                              groupValue: _selectedOptions[index],
+                              onChanged: _submitted
+                                  ? null
+                                  : (value) {
+                                setState(() {
+                                  _selectedOptions[index] = value;
+                                });
+                              },
+                            );
+                          }).toList(),
+                        ],
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: Color(0xFF1E1F22),
+            minimumSize: Size(double.infinity, 50),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+          onPressed: !_submitted && _selectedOptions.length == _questions.length ? _submitAnswers : null,
+          child: Text(
+            _submitted ? "Quiz Submitted" : "Submit Quiz",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
         ),
       ),
     );
@@ -1849,7 +2056,7 @@ class _JitsiMeetWebViewPageState extends State<JitsiMeetWebViewPage> {
   Future<void> _initializeCamera() async {
     _cameras = await availableCameras();
     _frontCamera = _cameras.firstWhere(
-        (camera) => camera.lensDirection == CameraLensDirection.front);
+            (camera) => camera.lensDirection == CameraLensDirection.front);
 
     _cameraController = CameraController(_frontCamera, ResolutionPreset.medium);
     await _cameraController.initialize();
@@ -1900,11 +2107,11 @@ class _JitsiMeetWebViewPageState extends State<JitsiMeetWebViewPage> {
       ),
       body: _isCameraReady && _isWebViewReady // التأكد من أن WebView جاهز
           ? Stack(
-              children: [
-                CameraPreview(_cameraController),
-                WebViewWidget(controller: _controller),
-              ],
-            )
+        children: [
+          CameraPreview(_cameraController),
+          WebViewWidget(controller: _controller),
+        ],
+      )
           : Center(child: CircularProgressIndicator()),
     );
   }
@@ -2135,3 +2342,57 @@ class _JitsiMeetWebViewPageState extends State<JitsiMeetWebViewPage> {
 //   }
 // }
 //
+
+
+class QuizResultScreen extends StatelessWidget {
+  final int correctCount;
+  final int totalQuestions;
+
+  const QuizResultScreen({required this.correctCount, required this.totalQuestions});
+
+  @override
+  Widget build(BuildContext context) {
+    double scorePercent = correctCount / totalQuestions;
+    String message = scorePercent >= 0.7 ? 'Bravo!' : 'Try Again!';
+
+    return Scaffold(
+      appBar:CustomAppBar(txt: "Quiz Result", isIconVisible: false),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            TweenAnimationBuilder(
+              tween: Tween<double>(begin: 0, end: correctCount.toDouble()),
+              duration: Duration(seconds: 2),
+              builder: (context, double value, child) {
+                return Text(
+                  'Score: ${value.toInt()} / $totalQuestions',
+                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                );
+              },
+            ),
+            SizedBox(height: 20),
+            Text(
+              message,
+              style: TextStyle(fontSize: 28, color: Colors.blue),
+            ),
+            SizedBox(height: 40),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Replay يعني يرجع للشاشة اللي فاتت
+              },
+              child: Text('Replay Quiz'),
+            ),
+            SizedBox(height: 10),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).popUntil((route) => route.isFirst); // Exit to main screen
+              },
+              child: Text('Exit'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

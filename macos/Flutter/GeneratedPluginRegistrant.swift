@@ -5,6 +5,7 @@
 import FlutterMacOS
 import Foundation
 
+import audioplayers_darwin
 import cloud_firestore
 import file_picker
 import file_selector_macos
@@ -16,7 +17,6 @@ import firebase_storage
 import flutter_local_notifications
 import flutter_localization
 import flutter_screen_capture
-import flutter_screen_share
 import path_provider_foundation
 import screen_capture
 import screen_retriever_macos
@@ -26,6 +26,7 @@ import url_launcher_macos
 import webview_flutter_wkwebview
 
 func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
+  AudioplayersDarwinPlugin.register(with: registry.registrar(forPlugin: "AudioplayersDarwinPlugin"))
   FLTFirebaseFirestorePlugin.register(with: registry.registrar(forPlugin: "FLTFirebaseFirestorePlugin"))
   FilePickerPlugin.register(with: registry.registrar(forPlugin: "FilePickerPlugin"))
   FileSelectorPlugin.register(with: registry.registrar(forPlugin: "FileSelectorPlugin"))
@@ -37,7 +38,6 @@ func RegisterGeneratedPlugins(registry: FlutterPluginRegistry) {
   FlutterLocalNotificationsPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalNotificationsPlugin"))
   FlutterLocalizationPlugin.register(with: registry.registrar(forPlugin: "FlutterLocalizationPlugin"))
   FlutterScreenCapturePlugin.register(with: registry.registrar(forPlugin: "FlutterScreenCapturePlugin"))
-  FlutterScreenSharePlugin.register(with: registry.registrar(forPlugin: "FlutterScreenSharePlugin"))
   PathProviderPlugin.register(with: registry.registrar(forPlugin: "PathProviderPlugin"))
   FlutterScreenCapturePlugin.register(with: registry.registrar(forPlugin: "FlutterScreenCapturePlugin"))
   ScreenRetrieverMacosPlugin.register(with: registry.registrar(forPlugin: "ScreenRetrieverMacosPlugin"))
