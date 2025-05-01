@@ -93,6 +93,12 @@ dependencies:
 
 
 dev_dependencies:
+  flutter_launcher_icons: ^0.14.3
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/img_1.png"
 
   flutter_test:
     sdk: flutter
@@ -126,6 +132,7 @@ flutter:
     - assets/lang/ar.json
     - assets/mixkit-mouse-click-close-1113.wav
     - assets/sec_mixdown-62016.mp3
+    - assets/x.mp3
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
